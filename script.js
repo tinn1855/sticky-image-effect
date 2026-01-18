@@ -27,11 +27,14 @@ class RollsRoyceScrollEffect {
             textEnd: 0.80
         };
 
+        const initialTextOpacity = this.isMobile() ? 1 : 0;
+        const initialTextTranslate = this.isMobile() ? 0 : 30;
+
         this.cuklentValues = {
             img1Size: 60,
             img2Translate: 100,
-            textOpacity: 0,
-            textTranslate: 30
+            textOpacity: initialTextOpacity,
+            textTranslate: initialTextTranslate
         };
         
         this.targetValues = { ...this.cuklentValues };
@@ -68,6 +71,10 @@ class RollsRoyceScrollEffect {
         return 1 - Math.pow(1 - t, 2);
     }
 
+    isMobile() {
+        return window.innerWidth <= 768;
+    }
+
     calculateTargets() {
         const rect = this.scrollContainer.getBoundingClientRect();
         const scrollContainerHeight = rect.height;
@@ -102,18 +109,38 @@ class RollsRoyceScrollEffect {
         const { textStart, textEnd } = this.timeline;
         let textOpacity = 0;
         let textTranslate = 30;
-        if (progress < textStart) {
-            textOpacity = 0;
-            textTranslate = 30;
-        } else if (progress >= textStart && progress <= textEnd) {
-            const p = (progress - textStart) / (textEnd - textStart);
-            const eased = this.easeOutQuad(p);
-            textOpacity = eased;
-            textTranslate = 30 - (eased * 30);
+
+        if (this.isMobile()) {
+            const textFadeStart = 0.70;
+            const textFadeEnd = 0.85;
+            
+            if (progress < textFadeStart) {
+                textOpacity = 1;      
+                textTranslate = 0;   
+            } else if (progress >= textFadeStart && progress <= textFadeEnd) {
+                const p = (progress - textFadeStart) / (textFadeEnd - textFadeStart);
+                const eased = this.easeOutQuad(p);
+                textOpacity = 1 - eased;  
+                textTranslate = -eased * 30; 
+            } else {
+                textOpacity = 0;
+                textTranslate = -30;
+            }
         } else {
-            textOpacity = 1;
-            textTranslate = 0;
+            if (progress < textStart) {
+                textOpacity = 0;
+                textTranslate = 30;
+            } else if (progress >= textStart && progress <= textEnd) {
+                const p = (progress - textStart) / (textEnd - textStart);
+                const eased = this.easeOutQuad(p);
+                textOpacity = eased;
+                textTranslate = 30 - (eased * 30);
+            } else {
+                textOpacity = 1;
+                textTranslate = 0;
+            }
         }
+
         this.targetValues.textOpacity = textOpacity;
         this.targetValues.textTranslate = textTranslate;
     }

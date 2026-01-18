@@ -135,6 +135,13 @@ body {
     backface-visibility: hidden;
 }
 
+@media (max-width: 768px) {
+    .kl-text-overlay {
+        opacity: var(--text-opacity, 1);
+        transform: translateY(var(--text-translate, 0)) translateZ(0);
+    }
+}
+
 .kl-headline {
     font-size: clamp(18px, 4.5vw, 32px);
     font-weight: 400;
